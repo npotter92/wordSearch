@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+		<title>Word Search Game</title>
+		<link rel="stylesheet" href="game.css"/>
+	</head>
+
+	<body>
+
+		<div class='mainDiv'>
+
+			<h1 class='gameTitle'>Word Search</h1>
+
+			<div class='contentDiv'>
+
+				<div class='loginDiv'>
+					<p class='gameText'>Enter your name and begin playing!</p>
+					<input type='text' id='userName'>
+					<button onclick='createPlayer();'><span class='buttonText'>Create New Player</span></button>
+					<button onclick='loginPlayer();'><span class='buttonText'>Login</span></button>
+				</div> <!-- contentDiv -->
+
+				<div class='gameplayDiv'>
+
+					<div class='tableDiv'>
+
+						<table class='gameTable' cellspacing='0' cellpadding='0'>
+							<tr>
+								<td><a href="" onclick="return false;"><span id='0' data-adj='[1, 4, 5]'></span></a></td>
+								<td><a href="" onclick="return false;"><span id='1' data-adj='[0, 2, 4, 5, 6]'></span></a></td>
+								<td><a href="" onclick="return false;"><span id='2' data-adj='[1, 3, 5, 6, 7]'></span></a></td>
+								<td><a href="" onclick="return false;"><span id='3' data-adj='[2, 6, 7]'></span></a></td>
+							</tr>
+							<tr>
+								<td><a href="" onclick="return false;"><span id='4' data-adj='[0, 1, 5, 8, 9]'></span></a></td>
+								<td><a href="" onclick="return false;"><span id='5' data-adj='[0, 1, 2, 4, 6, 8, 9, 10]'></span></a></td>
+								<td><a href="" onclick="return false;"><span id='6' data-adj='[1, 2, 3, 5, 7, 9, 10, 11]'></span></a></td>
+								<td><a href="" onclick="return false;"><span id='7' data-adj='[2, 3, 6, 10, 11]'></span></a></td>
+							</tr>
+							<tr>
+								<td><a href="" onclick="return false;"><span id='8' data-adj='[4, 5, 9, 12, 13]'></span></a></td>
+								<td><a href="" onclick="return false;"><span id='9' data-adj='[4, 5, 6, 8, 10, 12, 13, 14]'></span></a></td>
+								<td><a href="" onclick="return false;"><span id='10' data-adj='[5, 6, 7, 9, 11, 13, 14, 15]'></span></a></td>
+								<td><a href="" onclick="return false;"><span id='11' data-adj='[6, 7, 10, 14, 15]'></span></a></td>
+							</tr>
+							<tr>
+								<td><a href="" onclick="return false;"><span id='12' data-adj='[8, 9, 13]'></span></a></td>
+								<td><a href="" onclick="return false;"><span id='13' data-adj='[8, 9, 10, 12, 14]'></span></a></td>
+								<td><a href="" onclick="return false;"><span id='14' data-adj='[9, 10, 11, 13, 15]'></span></a></td>
+								<td><a href="" onclick="return false;"><span id='15' data-adj='[10, 11, 14]'></span></a></td>
+							</tr>
+						</table>
+
+					</div> <!-- tableDiv -->
+
+					<div class='gameInputDiv'>
+						<h2 class='timerText' id='timer'>60</h2>
+						<button onclick='enterWord();' class='gameButton'><span class='buttonText'>Enter your word</span></button>
+						<button onclick='eraseSelections();' class='gameButton'><span class='buttonText'>Erase current selection</span></button>
+						<h2 class='gameText' id='numWords'></h2>
+						<h3 class='currentWord'></h3>
+						<h2 class='alertText'></h2>
+					</div> <!-- gameInputDiv -->
+
+				</div> <!-- gameplayDiv -->
+
+				<div class='gameOverDiv'>
+					<p class='gameText'>Game Over!</p>
+					<p class='gameText' id='gameResult'></p>
+					<button onclick='start();'><span class='buttonText'>Play Again!</span></button>
+				</div> <!-- gameOverDiv -->
+
+			</div> <!-- contentDiv -->
+
+		</div> <!-- mainDiv -->
+
+		<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+		<script src="game.js"></script>
+
+	</body>
+
+</html>
