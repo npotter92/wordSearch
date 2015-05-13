@@ -3,7 +3,7 @@ var express = require("express"),
      fs = require("fs"),
 	 app;
 
-// Create our Express-powered HTTP server
+// Create our Express-powered HTTP server.
 // and have it listen on port 3000
 app = express();
 http.createServer(app).listen(3000);
