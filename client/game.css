@@ -68,6 +68,7 @@ button {
 
 .gameplayDiv {
 	display: none;
+	text-align: center;
 }
 
 .tableDiv {
@@ -75,8 +76,8 @@ button {
 	width: 400px;
 	height: 400px;
 	border-radius: 20px;
-	margin: 0 auto;
 	background: silver;
+	margin-bottom: 20px;
 }
 
 .gameInputDiv {
@@ -85,6 +86,11 @@ button {
 	margin-left: 50px;
 	width: 300px;
 	background-color: grey;
+	margin-bottom: 20px;
+}
+
+.raceCanvas {
+	border: 1px solid #000000;
 }
 
 .gameOverDiv {

@@ -1,6 +1,7 @@
 var dictionary, adj, lastId, gameBoard;
 var currentWord = "";
 var currentNum = 0;
+var wordLength = 0;
 var foundWords = [];
 var secondsLeft = 61;
 var wordStarted = false;
@@ -75,7 +76,6 @@ function loginPlayer() {
 function timerInterval() {
 	// Handle the game timer
     $('.timerText').html(--secondsLeft);
-    console.log(secondsLeft);
     if (secondsLeft <= 0) {
     	playingGame = false;
     	$(".gameTable tr td a span").toArray().forEach(function (element) {
@@ -87,6 +87,7 @@ function timerInterval() {
         $('.alertText').html("");
         $(".currentWord").html("");
         $("#gameResult").html("You found " + currentNum + " words!");
+        resetBalls();
         showGameOver();
 
         clearInterval(interval);
@@ -104,13 +105,16 @@ function eraseSelections() {
 	currentWord = "";
 	$(".currentWord").html(currentWord);
 	wordStarted = false;
+	wordLength = 0;
 }
 
 function enterWord() {
 	// Check to see if the currently selected sequence of letters is a word
 	if ($.inArray(currentWord, foundWords) > -1) {
+		// the word has already been found
 		$(".alertText").html("Already entered '" + currentWord + "'!");
 	} else if ($.inArray(currentWord, dictionary) > -1) {
+		// a new word has been found!
 		if (currentNum == 0) {
 			currentNum++;
 			$(".gameText").html("1 word found!");
@@ -119,8 +123,14 @@ function enterWord() {
 			$(".gameText").html(currentNum + " words found!");
 		}
 		$(".alertText").html("");
+
+		// add the word to the list of found words
 		foundWords.push(currentWord);
+		// move the player's ball forward
+		movePlayer(wordLength);
+
 	} else {
+		// the sequence of letters isn't in the dictionary
 		$(".alertText").html("Try again!");
 	}
 
@@ -148,6 +158,7 @@ function main() {
 				$gameSpace.addClass("lastClicked")
 				$gameSpace.addClass("clicked");
 				currentWord += $letter;
+				wordLength++;
 				$(".currentWord").html(currentWord);
 				if (wordStarted == false) {
 					wordStarted = true;
@@ -160,5 +171,3 @@ function main() {
 	});
 
 }
-
-$(document).ready(loadDictionary());
