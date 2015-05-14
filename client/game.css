@@ -68,7 +68,6 @@ button {
 
 .gameplayDiv {
 	display: none;
-	text-align: center;
 }
 
 .tableDiv {
@@ -80,7 +79,7 @@ button {
 	margin-bottom: 20px;
 }
 
-.gameInputDiv {
+.gameButtonDiv {
 	border-radius: 20px;
 	float: left;
 	margin-left: 50px;

@@ -7,6 +7,12 @@ var secondsLeft = 61;
 var wordStarted = false;
 var playingGame = false;
 
+var gameStage = new createjs.Stage("raceCanvas");
+var rect = gameStage.canvas.getBoundingClientRect();
+
+var playerHorse = new Horse(10, 20);
+
+
 function showGameOver() {
 	$('.gameOverDiv').show();
 	$('.gameplayDiv').hide();
@@ -87,7 +93,7 @@ function timerInterval() {
         $('.alertText').html("");
         $(".currentWord").html("");
         $("#gameResult").html("You found " + currentNum + " words!");
-        resetBalls();
+        playerHorse.resetPosition();
         showGameOver();
 
         clearInterval(interval);
@@ -127,7 +133,7 @@ function enterWord() {
 		// add the word to the list of found words
 		foundWords.push(currentWord);
 		// move the player's ball forward
-		movePlayer(wordLength);
+		playerHorse.updatePosition(wordLength);
 
 	} else {
 		// the sequence of letters isn't in the dictionary
@@ -137,6 +143,10 @@ function enterWord() {
 	eraseSelections();
 
 }
+
+var frameTick = function () {
+	gameStage.update();
+};
 
 function main() {
 	// Event handling
@@ -171,3 +181,7 @@ function main() {
 	});
 
 }
+
+$(document).ready(loadDictionary());
+createjs.Ticker.addEventListener("tick", frameTick);
+createjs.Ticker.setFPS(60);
