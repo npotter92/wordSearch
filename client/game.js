@@ -72,11 +72,30 @@ function start() {
 }
 
 function createPlayer() {
-	start();
+	$.post( "register.json",
+		    {"user": $("#username").val(), "password": $("#password").val()},
+		    function registrationHandler(resp_body) {
+				if( resp_body.status) {
+					start(); //redirect to main app page
+				} else {
+					alert(resp_body.comment);
+				}
+			}
+	);
+
 }
 
 function loginPlayer() {
-	start();
+	$.post( "login.json",
+		    {"user": $("#username").val(), "password": $("#password").val()},
+		    function registrationHandler(resp_body) {
+				if( resp_body.status) {
+					start(); //redirect to main app page
+				} else {
+					alert(resp_body.comment);
+				}
+			}
+	);
 }
 
 function timerInterval() {
