@@ -147,8 +147,10 @@ function enterWord() {
 		$(".gameText").html("Score: " + playerScore);
 		// add the word to the list of found words
 		foundWords.push(currentWord);
-		// move the player's ball forward
+		// move the player's horse forward
 		playerHorse.scorePosition = playerScore;
+		// call the horse's running animation
+		playerHorse.run();
 
 	} else {
 		// the sequence of letters isn't in the dictionary

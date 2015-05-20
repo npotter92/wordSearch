@@ -7,14 +7,13 @@ var Horse = function (x, y, image) {
 		"frames": {
 			"width": 50,
 			"height": 40,
-			"count": 1
+			"count": 2
 		},
 		"animations": {
-			"horse": {
-				"frames": [0],
-			}
+			'stand': [0],
+			'run': [0, 1, 'run', 0.25]
 		}
-	}), "horse");
+	}), 'stand');
 
 	this.animations.x = x;
 	this.animations.y = y;
@@ -23,13 +22,24 @@ var Horse = function (x, y, image) {
 
 	gameStage.addChild(this.animations);
 
+	this.run = function() {
+		this.animations.gotoAndPlay('run');
+	}
+
+	this.stand = function() {
+		this.animations.gotoAndPlay('stand');
+	}
+
 	this.updatePosition = function() {
 
 		if (this.animations.x < this.scorePosition) {
-			this.animations.x++
+			this.animations.x++;
+		} else {
+			// The horse has finished moving, return to the standing animation
+			this.animations.gotoAndPlay('stand');
 		}
 
-		//this.animations.x += step * 10;
+
 	}
 
 	this.resetPosition = function() {
