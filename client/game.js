@@ -12,7 +12,6 @@ var rect = gameStage.canvas.getBoundingClientRect();
 
 var playerHorse = new Horse(10, 20);
 
-
 function showGameOver() {
 	$('.gameOverDiv').show();
 	$('.gameplayDiv').hide();
@@ -57,7 +56,6 @@ function start() {
 		var boards = response.boards;
 		var boardNum = response.boardNum;
 		gameBoard = boards[boardNum];
-		// TODO FILL IN BOARD
 		for (var i=0; i<16; i++) {
 			$(".gameTable tr td a span").toArray().forEach(function (element) {
 				var $gameSpace = $(element);
@@ -152,7 +150,7 @@ function enterWord() {
 		// add the word to the list of found words
 		foundWords.push(currentWord);
 		// move the player's ball forward
-		playerHorse.updatePosition(wordLength);
+		playerHorse.scorePosition += wordLength * 8;
 
 	} else {
 		// the sequence of letters isn't in the dictionary
@@ -164,6 +162,7 @@ function enterWord() {
 }
 
 var frameTick = function () {
+	playerHorse.updatePosition();
 	gameStage.update();
 };
 

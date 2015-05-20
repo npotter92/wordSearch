@@ -19,10 +19,17 @@ var Horse = function (x, y) {
 	this.animations.x = x;
 	this.animations.y = y;
 
+	this.scorePosition = x;
+
 	gameStage.addChild(this.animations);
 
-	this.updatePosition = function(step) {
-		this.animations.x += step * 10;
+	this.updatePosition = function() {
+
+		if (this.animations.x < this.scorePosition) {
+			this.animations.x++
+		}
+
+		//this.animations.x += step * 10;
 	}
 
 	this.resetPosition = function() {
