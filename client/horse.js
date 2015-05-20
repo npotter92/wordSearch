@@ -1,12 +1,12 @@
 "use strict";
 
-var Horse = function (x, y) {
+var Horse = function (x, y, image) {
 
 	this.animations = new createjs.Sprite(new createjs.SpriteSheet({
-		"images": ["./ball.png"],
+		"images": [image],
 		"frames": {
-			"width": 20,
-			"height": 20,
+			"width": 50,
+			"height": 40,
 			"count": 1
 		},
 		"animations": {

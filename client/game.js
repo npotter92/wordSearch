@@ -2,6 +2,7 @@ var dictionary, adj, lastId, gameBoard;
 var currentWord = "";
 var currentNum = 0;
 var wordLength = 0;
+var playerScore = 0;
 var foundWords = [];
 var secondsLeft = 61;
 var wordStarted = false;
@@ -10,7 +11,7 @@ var playingGame = false;
 var gameStage = new createjs.Stage("raceCanvas");
 var rect = gameStage.canvas.getBoundingClientRect();
 
-var playerHorse = new Horse(10, 20);
+var playerHorse = new Horse(10, 20, "./playerHorse.png");
 
 function showGameOver() {
 	$('.gameOverDiv').show();
@@ -109,7 +110,7 @@ function timerInterval() {
         $('.gameText').html("");
         $('.alertText').html("");
         $(".currentWord").html("");
-        $("#gameResult").html("You found " + currentNum + " words!");
+        $("#gameResult").html("You found " + currentNum + " words for a score of " + playerScore + "!");
         playerHorse.resetPosition();
         showGameOver();
 
@@ -137,20 +138,17 @@ function enterWord() {
 		// the word has already been found
 		$(".alertText").html("Already entered '" + currentWord + "'!");
 	} else if ($.inArray(currentWord, dictionary) > -1) {
+		
 		// a new word has been found!
-		if (currentNum == 0) {
-			currentNum++;
-			$(".gameText").html("1 word found!");
-		} else {
-			currentNum++;
-			$(".gameText").html(currentNum + " words found!");
-		}
-		$(".alertText").html("");
 
+		$(".alertText").html("");
+		currentNum++;
+		playerScore += wordLength * 8;
+		$(".gameText").html("Score: " + playerScore);
 		// add the word to the list of found words
 		foundWords.push(currentWord);
 		// move the player's ball forward
-		playerHorse.scorePosition += wordLength * 8;
+		playerHorse.scorePosition = playerScore;
 
 	} else {
 		// the sequence of letters isn't in the dictionary
