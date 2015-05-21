@@ -6,12 +6,12 @@ var Horse = function (x, y, image) {
 		"images": [image],
 		"frames": {
 			"width": 50,
-			"height": 40,
-			"count": 2
+			"height": 42,
+			"count": 4
 		},
 		"animations": {
 			'stand': [0],
-			'run': [0, 1, 'run', 0.25]
+			'run': [0, 3, 'run', 0.25]
 		}
 	}), 'stand');
 

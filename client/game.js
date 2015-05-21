@@ -143,7 +143,7 @@ function enterWord() {
 
 		$(".alertText").html("");
 		currentNum++;
-		playerScore += wordLength * 8;
+		playerScore += wordLength * 10;
 		$(".gameText").html("Score: " + playerScore);
 		// add the word to the list of found words
 		foundWords.push(currentWord);
