@@ -4,6 +4,8 @@ var currentNum = 0;
 var wordLength = 0;
 var playerScore = 0;
 var foundWords = [];
+var scoreMoments = [];
+var playerUserName = ""; 
 var secondsLeft = 61;
 var wordStarted = false;
 var playingGame = false;
@@ -12,6 +14,11 @@ var gameStage = new createjs.Stage("raceCanvas");
 var rect = gameStage.canvas.getBoundingClientRect();
 
 var playerHorse = new Horse(10, 20, "./playerHorse.png");
+
+var ScoreMoment = function(secondsLeft, score) {
+	this.secondsLeft = secondsLeft;
+	this.score = score;
+}
 
 function showGameOver() {
 	$('.gameOverDiv').show();
@@ -71,10 +78,11 @@ function start() {
 }
 
 function createPlayer() {
-	$.post( "register.json",
+	$.post( "register",
 		    {"user": $("#username").val(), "password": $("#password").val()},
-		    function registrationHandler(resp_body) {
+		    function (resp_body) {
 				if( resp_body.status) {
+					playerUserName = $("#username").val();
 					start(); //redirect to main app page
 				} else {
 					alert(resp_body.comment);
@@ -85,10 +93,11 @@ function createPlayer() {
 }
 
 function loginPlayer() {
-	$.post( "login.json",
+	$.post( "login",
 		    {"user": $("#username").val(), "password": $("#password").val()},
-		    function registrationHandler(resp_body) {
+		    function (resp_body) {
 				if( resp_body.status) {
+					playerUserName = $("#username").val();
 					start(); //redirect to main app page
 				} else {
 					alert(resp_body.comment);
@@ -98,6 +107,7 @@ function loginPlayer() {
 }
 
 function timerInterval() {
+	console.log(secondsLeft+"continue");
 	// Handle the game timer
     $('.timerText').html(--secondsLeft);
     if (secondsLeft <= 0) {
@@ -112,12 +122,23 @@ function timerInterval() {
         $(".currentWord").html("");
         $("#gameResult").html("You found " + currentNum + " words for a score of " + playerScore + "!");
         playerHorse.resetPosition();
+        // TODO set score to zero?? 
         showGameOver();
 
-        clearInterval(interval);
+        // send the array to server
+        $.post("saveScoreMoments", 
+        	   {"user": playerUserName, "scoreMoments": JSON.stringify(scoreMoments)},
+        	   	function (resp_body) {
+					if(!resp_body.status) {
+						alert(resp_body.comment);
+					}
+				}
+		);
+
+    } else {
+		setTimeout(timerInterval, 1000);
     }
 
-    setTimeout(timerInterval, 1000)
 }
 
 function eraseSelections() {
@@ -151,6 +172,8 @@ function enterWord() {
 		playerHorse.scorePosition = playerScore;
 		// call the horse's running animation
 		playerHorse.run();
+		// save the time and progress
+		scoreMoments.push(new ScoreMoment(secondsLeft, playerHorse.scorePosition));
 
 	} else {
 		// the sequence of letters isn't in the dictionary

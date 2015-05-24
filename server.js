@@ -39,7 +39,7 @@ mongoose.connection.on('disconnected', function () {
 
 var UserSchema = mongoose.Schema({ user: String,
                                    password: String,
-                                   history: [Date] // TODO what else should be included
+                                   scoreMoments: String // TODO what else should be included
                                  });
 
 var User = mongoose.model("User", UserSchema);
@@ -67,7 +67,7 @@ app.get("/readBoard", function (req, res) {
 	res.json({"boards":boards, "boardNum":boardNum});
 })
 
-app.post("/register.json", function (req, res) {
+app.post("/register", function (req, res) {
 	var the_body = req.body;
 	mongoCheckCredentialExistence(the_body, function (answer){
 		if (answer.user === true) { 
@@ -86,7 +86,7 @@ app.post("/register.json", function (req, res) {
 	});
 });
 
-app.post("/login.json", function (req, res) {
+app.post("/login", function (req, res) {
 	var the_body = req.body;
 	mongoCheckCredentialExistence(the_body, function (answer){
 		if (answer.user && answer.password) { 
@@ -95,6 +95,62 @@ app.post("/login.json", function (req, res) {
 			res.json({"status": false, "comment": "Login failed!"});
 		}
 	});
+});
+
+app.post("/saveScoreMoments", function (req, res) {
+	var the_body = req.body;
+	var user = the_body.user;
+	var newScoreMoments = JSON.parse(the_body.scoreMoments); // an array of score moments
+
+	User.findOne({"user": user}, function(err, result) {
+		if(err) { 
+			res.json({"status": false, "comment": ("Database error: " + err)});
+			return;
+		}
+
+		if (result) {
+			result.update(
+				{"scoreMoments": the_body.scoreMoments},
+				function (err, id) {
+					if (err) {
+						res.json({"status": false, "comment": ("Database error: " + err)});
+					}
+				}
+			);
+
+			///// TODO below code is for saving the best scores 
+			///// if we want to do that, we need to create the class ScoreMoment on the server side
+			///// that is the same as the one on the client side. Ned told me that it was a bad approach
+			// var currentScoreMoments = result.scoreMoments;
+			// if (currentScoreMoments) {
+			// 	// we only save the best scores of the users 
+			// 	// TODO assume a user's initial score is 0 (refer to the conversation at 12pm on 5/24)
+			// 	if (currentScoreMoments[currentScoreMoments.length-1].score > 
+			// 		newScoreMoments[newScoreMoments.length-1].score) { 
+			// 		result.update(
+			// 			{"scoreMoments": the_body.scoreMoments},
+			// 			function (err, id) {
+			// 				if (err) {
+			// 					res.json({"status": false, "comment": ("Database error: " + err)});
+			// 				}
+			// 			}
+			// 		);
+			// 	}
+			// } else { // user's first time playing this game
+			// 	result.update(
+			// 		{"scoreMoments": the_body.scoreMoments},
+			// 		function (err, id) {
+			// 			if (err) {
+			// 				res.json({"status": false, "comment": ("Database error: " + err)});
+			// 			}
+			// 		}
+			// 	);
+			// }
+		} else {
+			res.json({"status": false, "comment": "current user's information is not in the database!"});
+		}
+	})
+
 });
 
 function mongoCheckCredentialExistence (credential, callback) {
