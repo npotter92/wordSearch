@@ -44,8 +44,6 @@ var UserSchema = mongoose.Schema({ user: String,
 
 var User = mongoose.model("User", UserSchema);
 
-
-
 // routes
 
 app.get("/dictionary", function (req, res) {
@@ -95,6 +93,49 @@ app.post("/login", function (req, res) {
 			res.json({"status": false, "comment": "Login failed!"});
 		}
 	});
+});
+
+app.post("/getPlayerList", function (req, res) {
+	User.find({}).exec(
+		function (err, documents){
+			if(err) { 
+				res.json({"status": false, "comment": ("Database error: " + err)});
+				return;
+			}
+
+			// adding all users that have played at least once
+			var userList = [];
+			for(var i=0;i<documents.length;i++){
+				if (documents[i].scoreMoments) {
+					userList.push(documents[i].user);
+				}
+			}
+			res.json({"status": true, "userList": JSON.stringify(userList)});
+		}
+	)
+});
+
+app.post("/selectOpponent", function (req, res) {
+	var user = req.body.user;
+
+	User.findOne({"user": user}, 
+		function(err, result) {
+			if(err) { 
+				res.json({"status": false, "comment": ("Database error: " + err)});
+				return;
+			}
+
+			if (result) {
+				if (result.scoreMoments) {
+					res.json({"status": true, "opponentScoreMoments": result.scoreMoments});
+				} else {
+					res.json({"status": false, "comment": "The user has no game data."});
+				}
+			} else { // unlikely to happen
+				res.json({"status": false, "comment": "Can not find the user."});
+			}
+		}
+	);
 });
 
 app.post("/saveScoreMoments", function (req, res) {

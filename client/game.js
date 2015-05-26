@@ -5,6 +5,7 @@ var wordLength = 0;
 var playerScore = 0;
 var foundWords = [];
 var scoreMoments = [];
+var opponentScoreMoments = [];
 var playerUserName = ""; 
 var secondsLeft = 61;
 var wordStarted = false;
@@ -22,6 +23,7 @@ var ScoreMoment = function(secondsLeft, score) {
 
 function showGameOver() {
 	$('.gameOverDiv').show();
+	$('.selectOpponentDiv').hide();
 	$('.gameplayDiv').hide();
 	$('.loginDiv').hide();
 }
@@ -30,12 +32,36 @@ function showGameplay() {
 	$('.gameplayDiv').show();
 	$('.gameOverDiv').hide();
 	$('.loginDiv').hide();
+	$('.selectOpponentDiv').hide();
 }
 
 function showLogin() {
 	$('.loginDiv').show();
 	$('.gameplayDiv').hide();
 	$('.gameOverDiv').hide();
+	$('.selectOpponentDiv').hide();
+}
+
+function showSelectOpponent() {
+	$('.selectOpponentDiv').show();
+	$('.loginDiv').hide();
+	$('.gameplayDiv').hide();
+	$('.gameOverDiv').hide();
+
+	$.post("getPlayerList", {},
+		   function (resp_body) {
+		   		if (resp_body.status) {
+		   			var userList = JSON.parse(resp_body.userList);
+		   			for (var i = 0; i < userList.length; i++) {
+		   				var user = userList[i];
+		   				var $option = $("<option>").text(user).val(user);
+		   				$(".ghostPlayerSelect").append($option);
+		   			}
+		   		} else {
+		   			alert("Unable to retrieve ghost players! Server response: " + resp_body.comment);
+		   		}
+		   }
+	);
 }
 
 function loadDictionary() {
@@ -78,12 +104,22 @@ function start() {
 }
 
 function createPlayer() {
+	if ($("#username").val().trim().length === 0 || 
+		$("#password").val().trim().length === 0) {
+		return;
+	}
+
+	if ($("#username").val() === "none") { // set the option
+		alert("Invalid username. Please choose another");
+		return;
+	}
+
 	$.post( "register",
 		    {"user": $("#username").val(), "password": $("#password").val()},
 		    function (resp_body) {
 				if( resp_body.status) {
 					playerUserName = $("#username").val();
-					start(); //redirect to main app page
+					showSelectOpponent(); //redirect to select user page
 				} else {
 					alert(resp_body.comment);
 				}
@@ -93,12 +129,16 @@ function createPlayer() {
 }
 
 function loginPlayer() {
+	if ($("#username").val().trim().length === 0 || 
+		$("#password").val().trim().length === 0) {
+		return;
+	}
 	$.post( "login",
 		    {"user": $("#username").val(), "password": $("#password").val()},
 		    function (resp_body) {
 				if( resp_body.status) {
 					playerUserName = $("#username").val();
-					start(); //redirect to main app page
+					showSelectOpponent(); //redirect to select user page
 				} else {
 					alert(resp_body.comment);
 				}
@@ -106,10 +146,37 @@ function loginPlayer() {
 	);
 }
 
+function selectGhostPlayer() {
+    opponentScoreMoments = []; // empty the array
+
+	var playerName = $('.ghostPlayerSelect').find(":selected").val();
+	if (playerName !== "none") { // not playing against any player
+		$.post("selectOpponent", 
+			   {"user": playerName},
+			   function (resp_body) {
+			   		console.log(resp_body);
+					if( resp_body.status) {
+						opponentScoreMoments = JSON.parse(resp_body.opponentScoreMoments);
+					} else {
+						alert(resp_body.comment+
+							  "\nGhost player is not available at this point.");
+					}
+			   }
+		);
+	}
+
+	$('.ghostPlayerSelect').empty()
+    .append('<option selected value="none">I don\'t want to play against anyone.</option>');
+
+	start();
+}
+
+
 function timerInterval() {
-	console.log(secondsLeft+"continue");
 	// Handle the game timer
     $('.timerText').html(--secondsLeft);
+
+    // Handle the clean-up task after a game is over
     if (secondsLeft <= 0) {
     	playingGame = false;
     	$(".gameTable tr td a span").toArray().forEach(function (element) {
@@ -122,7 +189,7 @@ function timerInterval() {
         $(".currentWord").html("");
         $("#gameResult").html("You found " + currentNum + " words for a score of " + playerScore + "!");
         playerHorse.resetPosition();
-        // TODO set score to zero?? 
+		playerScore = 0;
         showGameOver();
 
         // send the array to server

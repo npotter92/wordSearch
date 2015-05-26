@@ -55,6 +55,22 @@ button {
 	text-align: center;
 }
 
+.selectOpponentDiv {
+	display: none;
+}
+
+.selectOpponentText {
+	font-family: Arial;
+	font-size: 20px;
+	text-align: center;
+}
+
+
+.ghostPlayerSelect {
+	display: block;
+	margin: 0 auto;
+}
+
 .contentDiv {
 	width: 800px;
 	margin: 0 auto;
