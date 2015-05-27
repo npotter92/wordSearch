@@ -13,6 +13,8 @@ var secondsLeft = 61;
 var wordStarted = false;
 var playingGame = false;
 var playingGhost = false;
+var currentBoardNum = 0;
+var currentOpponent;
 
 var gameStage = new createjs.Stage("raceCanvas");
 var rect = gameStage.canvas.getBoundingClientRect();
@@ -97,8 +99,15 @@ function start() {
 
 	$.get("readBoard", {}, function (response) {
 		var boards = response.boards;
-		var boardNum = response.boardNum;
-		gameBoard = boards[boardNum];
+		if (playingGhost) {
+			console.log("Playing on ghost's last board");
+			currentBoardNum = currentOpponent.boardNum;
+		} else {
+			console.log("Playing on random board");
+			currentBoardNum = response.boardNum;
+		}
+		console.log(currentBoardNum);
+		gameBoard = boards[currentBoardNum];
 		for (var i=0; i<16; i++) {
 			$(".gameTable tr td a span").toArray().forEach(function (element) {
 				var $gameSpace = $(element);
@@ -165,6 +174,7 @@ function selectGhostPlayer() {
 			   function (resp_body) {
 					if( resp_body.status) {
 						opponentScoreMoments = JSON.parse(resp_body.opponentScoreMoments);
+						currentOpponent = resp_body;
 					} else {
 						alert(resp_body.comment+
 							  "\nGhost player is not available at this point.");
@@ -256,7 +266,7 @@ function timerInterval() {
 
         // send the array to server
         $.post("saveScoreMoments", 
-        	   {"user": playerUserName, "scoreMoments": JSON.stringify(scoreMoments)},
+        	   {"user": playerUserName, "scoreMoments": JSON.stringify(scoreMoments), "boardNum": currentBoardNum},
         	   	function (resp_body) {
 					if(!resp_body.status) {
 						alert(resp_body.comment);

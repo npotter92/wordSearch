@@ -39,7 +39,8 @@ mongoose.connection.on('disconnected', function () {
 
 var UserSchema = mongoose.Schema({ user: String,
                                    password: String,
-                                   scoreMoments: String // TODO what else should be included
+                                   scoreMoments: String,
+                                   boardNum: Number // TODO what else should be included
                                  });
 
 var User = mongoose.model("User", UserSchema);
@@ -60,7 +61,7 @@ app.get("/dictionary", function (req, res) {
 
 app.get("/readBoard", function (req, res) {
 	var boardsObj = JSON.parse(fs.readFileSync("res/boards.txt"));
-	var boardNum = Math.floor(Math.random() * 2);
+	var boardNum = Math.floor(Math.random() * 8);
 	var boards = boardsObj.boards;
 	res.json({"boards":boards, "boardNum":boardNum});
 })
@@ -127,7 +128,7 @@ app.post("/selectOpponent", function (req, res) {
 
 			if (result) {
 				if (result.scoreMoments) {
-					res.json({"status": true, "opponentScoreMoments": result.scoreMoments});
+					res.json({"status": true, "opponentScoreMoments": result.scoreMoments, "boardNum": result.boardNum});
 				} else {
 					res.json({"status": false, "comment": "The user has no game data."});
 				}
@@ -142,6 +143,7 @@ app.post("/saveScoreMoments", function (req, res) {
 	var the_body = req.body;
 	var user = the_body.user;
 	var newScoreMoments = JSON.parse(the_body.scoreMoments); // an array of score moments
+	var newBoardNum = JSON.parse(the_body.boardNum);
 
 	User.findOne({"user": user}, function(err, result) {
 		if(err) { 
@@ -151,7 +153,7 @@ app.post("/saveScoreMoments", function (req, res) {
 
 		if (result) {
 			result.update(
-				{"scoreMoments": the_body.scoreMoments},
+				{"scoreMoments": the_body.scoreMoments, "boardNum": the_body.boardNum},
 				function (err, id) {
 					if (err) {
 						res.json({"status": false, "comment": ("Database error: " + err)});
