@@ -3,18 +3,22 @@ var currentWord = "";
 var currentNum = 0;
 var wordLength = 0;
 var playerScore = 0;
+var opponentScore = 0;
 var foundWords = [];
 var scoreMoments = [];
 var opponentScoreMoments = [];
 var playerUserName = ""; 
+var opponentName = "";
 var secondsLeft = 61;
 var wordStarted = false;
 var playingGame = false;
+var playingGhost = false;
 
 var gameStage = new createjs.Stage("raceCanvas");
 var rect = gameStage.canvas.getBoundingClientRect();
 
 var playerHorse = new Horse(10, 20, "./playerHorse.png");
+var ghostHorse = new Horse(10, 80, "./ghostHorse.png");
 
 var ScoreMoment = function(secondsLeft, score) {
 	this.secondsLeft = secondsLeft;
@@ -74,6 +78,7 @@ function loadDictionary() {
 }
 
 function start() {
+
 	// Reset everything and start a new game
 
 	currentWord = "";
@@ -82,6 +87,10 @@ function start() {
 	secondsLeft = 61;
 	wordStarted = false;
 	playingGame = true;
+	playerHorse.resetPosition();
+	playerScore = 0;
+	ghostHorse.resetPosition();
+	scoreMoments = [];
 
 	showGameplay();
     $('.gameText').html("");
@@ -149,12 +158,41 @@ function loginPlayer() {
 function selectGhostPlayer() {
     opponentScoreMoments = []; // empty the array
 
-	var playerName = $('.ghostPlayerSelect').find(":selected").val();
-	if (playerName !== "none") { // not playing against any player
+	opponentName = $('.ghostPlayerSelect').find(":selected").val();
+	if (opponentName !== "none") { // not playing against any player
 		$.post("selectOpponent", 
-			   {"user": playerName},
+			   {"user": opponentName},
 			   function (resp_body) {
-			   		console.log(resp_body);
+					if( resp_body.status) {
+						opponentScoreMoments = JSON.parse(resp_body.opponentScoreMoments);
+					} else {
+						alert(resp_body.comment+
+							  "\nGhost player is not available at this point.");
+					}
+			   }
+		);
+		playingGhost = true;
+		ghostHorse.show();
+	} else {
+		playingGhost = false;
+		ghostHorse.hide();
+	}
+
+	// position the player's horse based on wether or not a ghost race is happening
+	playerHorse.changeY(playingGhost);
+
+	$('.ghostPlayerSelect').empty()
+    .append('<option selected value="none">I don\'t want to play against anyone.</option>');
+
+	start();
+}
+
+function replay() {
+	if (playingGhost) {
+		opponentScoreMoments = [];
+		$.post("selectOpponent", 
+			   {"user": opponentName},
+			   function (resp_body) {
 					if( resp_body.status) {
 						opponentScoreMoments = JSON.parse(resp_body.opponentScoreMoments);
 					} else {
@@ -165,9 +203,6 @@ function selectGhostPlayer() {
 		);
 	}
 
-	$('.ghostPlayerSelect').empty()
-    .append('<option selected value="none">I don\'t want to play against anyone.</option>');
-
 	start();
 }
 
@@ -175,6 +210,15 @@ function selectGhostPlayer() {
 function timerInterval() {
 	// Handle the game timer
     $('.timerText').html(--secondsLeft);
+
+    // move the ghost
+    for (var i=0; i<opponentScoreMoments.length; i++) {
+    	if (secondsLeft == opponentScoreMoments[i].secondsLeft) {
+    		opponentScore += opponentScoreMoments[i].score;
+    		ghostHorse.scorePosition = opponentScore;
+    		ghostHorse.run();
+    	}
+    }
 
     // Handle the clean-up task after a game is over
     if (secondsLeft <= 0) {
@@ -187,9 +231,27 @@ function timerInterval() {
         $('.gameText').html("");
         $('.alertText').html("");
         $(".currentWord").html("");
-        $("#gameResult").html("You found " + currentNum + " words for a score of " + playerScore + "!");
+
+        var raceResult;
+        if (playerScore > opponentScore) {
+        	raceResult = "won";
+        } else if (playerScore < opponentScore) {
+        	raceResult = "lost";
+        } else {
+        	raceResult = "tied";
+        }
+
+        if (!playingGhost) {
+        	$("#gameResult").html("You found " + currentNum + " words for a score of " + playerScore + "!");
+        } else {
+        	$("#gameResult").html("<p>You found " + currentNum + " words for a score of " + playerScore + "!</p>" +
+        						  "<p>You " + raceResult + " against your ghost racer!");
+        }
+
+        ghostHorse.resetPosition();
         playerHorse.resetPosition();
 		playerScore = 0;
+		opponentScore = 0;
         showGameOver();
 
         // send the array to server
@@ -230,8 +292,9 @@ function enterWord() {
 		// a new word has been found!
 
 		$(".alertText").html("");
+		currentScore = wordLength * 10;
 		currentNum++;
-		playerScore += wordLength * 10;
+		playerScore += currentScore;
 		$(".gameText").html("Score: " + playerScore);
 		// add the word to the list of found words
 		foundWords.push(currentWord);
@@ -240,7 +303,7 @@ function enterWord() {
 		// call the horse's running animation
 		playerHorse.run();
 		// save the time and progress
-		scoreMoments.push(new ScoreMoment(secondsLeft, playerHorse.scorePosition));
+		scoreMoments.push(new ScoreMoment(secondsLeft, currentScore));
 
 	} else {
 		// the sequence of letters isn't in the dictionary
@@ -253,6 +316,7 @@ function enterWord() {
 
 var frameTick = function () {
 	playerHorse.updatePosition();
+	ghostHorse.updatePosition();
 	gameStage.update();
 };
 

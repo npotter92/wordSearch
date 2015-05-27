@@ -22,12 +22,28 @@ var Horse = function (x, y, image) {
 
 	gameStage.addChild(this.animations);
 
+	this.changeY = function(ghostRacer) {
+		if (ghostRacer == true) {
+			this.animations.y = 20;
+		} else {
+			this.animations.y = 50;
+		}
+	}
+
 	this.run = function() {
 		this.animations.gotoAndPlay('run');
 	}
 
 	this.stand = function() {
 		this.animations.gotoAndPlay('stand');
+	}
+
+	this.hide = function() {
+		this.animations.visible = false;
+	}
+
+	this.show = function() {
+		this.animations.visible = true;
 	}
 
 	this.updatePosition = function() {
@@ -44,6 +60,7 @@ var Horse = function (x, y, image) {
 
 	this.resetPosition = function() {
 		this.animations.x = 10;
+		this.scorePosition = 10;
 	}
 
 }
