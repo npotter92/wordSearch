@@ -19,8 +19,8 @@ var currentOpponent;
 var gameStage = new createjs.Stage("raceCanvas");
 var rect = gameStage.canvas.getBoundingClientRect();
 
-var playerHorse = new Horse(10, 20, "./playerHorse.png");
-var ghostHorse = new Horse(10, 80, "./ghostHorse.png");
+var playerHorse = new Horse(10, 20, "images/playerHorse.png");
+var ghostHorse = new Horse(10, 80, "images/ghostHorse.png");
 
 var ScoreMoment = function(secondsLeft, score) {
 	this.secondsLeft = secondsLeft;
