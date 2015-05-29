@@ -156,7 +156,6 @@ app.post("/saveScoreMoments", function (req, res) {
 		if (result) {
 			console.log(score, result.highScore);
 			if (score > result.highScore) {
-				console.log("New high score!");
 				result.update(
 					{"scoreMoments": the_body.scoreMoments, "boardNum": the_body.boardNum, "highScore": score},
 					function (err, id) {
@@ -165,8 +164,9 @@ app.post("/saveScoreMoments", function (req, res) {
 						}
 					}
 				);
+				res.json({"status": true, "newHighScore": true});
 			} else {
-				console.log("Did not beat high score");
+				res.json({"status": true, "newHighScore": false});
 			}
 
 			///// TODO below code is for saving the best scores 

@@ -265,6 +265,9 @@ function timerInterval() {
 					if(!resp_body.status) {
 						alert(resp_body.comment);
 					}
+					if (resp_body.newHighScore) {
+						$('#gameResult').append("<p>You set a new personal high score!</p>");
+					}
 				}
 		);
 
