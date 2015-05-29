@@ -40,7 +40,8 @@ mongoose.connection.on('disconnected', function () {
 var UserSchema = mongoose.Schema({ user: String,
                                    password: String,
                                    scoreMoments: String,
-                                   boardNum: Number // TODO what else should be included
+                                   boardNum: Number,
+                                   highScore: Number // TODO what else should be included
                                  });
 
 var User = mongoose.model("User", UserSchema);
@@ -72,7 +73,7 @@ app.post("/register", function (req, res) {
 		if (answer.user === true) { 
 			res.json({"status": false, "comment": "Username has been taken!"});
 		} else {
-			var u1 = new User({"user": the_body.user, "password": the_body.password});
+			var u1 = new User({"user": the_body.user, "password": the_body.password, "highScore": 0});
 			u1.save(function (err, data) {
 				if (err != null) {
 					res.json({"status": false, "comment": "Database error!"});
@@ -144,6 +145,7 @@ app.post("/saveScoreMoments", function (req, res) {
 	var user = the_body.user;
 	var newScoreMoments = JSON.parse(the_body.scoreMoments); // an array of score moments
 	var newBoardNum = JSON.parse(the_body.boardNum);
+	var score = JSON.parse(the_body.totalScore);
 
 	User.findOne({"user": user}, function(err, result) {
 		if(err) { 
@@ -152,14 +154,20 @@ app.post("/saveScoreMoments", function (req, res) {
 		}
 
 		if (result) {
-			result.update(
-				{"scoreMoments": the_body.scoreMoments, "boardNum": the_body.boardNum},
-				function (err, id) {
-					if (err) {
-						res.json({"status": false, "comment": ("Database error: " + err)});
+			console.log(score, result.highScore);
+			if (score > result.highScore) {
+				console.log("New high score!");
+				result.update(
+					{"scoreMoments": the_body.scoreMoments, "boardNum": the_body.boardNum, "highScore": score},
+					function (err, id) {
+						if (err) {
+							res.json({"status": false, "comment": ("Database error: " + err)});
+						}
 					}
-				}
-			);
+				);
+			} else {
+				console.log("Did not beat high score");
+			}
 
 			///// TODO below code is for saving the best scores 
 			///// if we want to do that, we need to create the class ScoreMoment on the server side

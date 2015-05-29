@@ -258,21 +258,21 @@ function timerInterval() {
         						  "<p>You " + raceResult + " against your ghost racer!");
         }
 
-        ghostHorse.resetPosition();
-        playerHorse.resetPosition();
-		playerScore = 0;
-		opponentScore = 0;
-        showGameOver();
-
         // send the array to server
         $.post("saveScoreMoments", 
-        	   {"user": playerUserName, "scoreMoments": JSON.stringify(scoreMoments), "boardNum": currentBoardNum},
+        	   {"user": playerUserName, "scoreMoments": JSON.stringify(scoreMoments), "boardNum": currentBoardNum, "totalScore": playerScore},
         	   	function (resp_body) {
 					if(!resp_body.status) {
 						alert(resp_body.comment);
 					}
 				}
 		);
+
+		ghostHorse.resetPosition();
+        playerHorse.resetPosition();
+		playerScore = 0;
+		opponentScore = 0;
+        showGameOver();
 
     } else {
 		setTimeout(timerInterval, 1000);
