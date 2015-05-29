@@ -154,7 +154,6 @@ app.post("/saveScoreMoments", function (req, res) {
 		}
 
 		if (result) {
-			console.log(score, result.highScore);
 			if (score > result.highScore) {
 				result.update(
 					{"scoreMoments": the_body.scoreMoments, "boardNum": the_body.boardNum, "highScore": score},

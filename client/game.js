@@ -1,31 +1,14 @@
 var dictionary, adj, lastId, gameBoard;
-var currentWord = "";
-var currentNum = 0;
-var wordLength = 0;
-var playerScore = 0;
-var opponentScore = 0;
-var foundWords = [];
-var scoreMoments = [];
-var opponentScoreMoments = [];
-var playerUserName = ""; 
-var opponentName = "";
 var secondsLeft = 61;
-var wordStarted = false;
 var playingGame = false;
 var playingGhost = false;
 var currentBoardNum = 0;
-var currentOpponent;
 
 var gameStage = new createjs.Stage("raceCanvas");
 var rect = gameStage.canvas.getBoundingClientRect();
 
-var playerHorse = new Horse(10, 20, "images/playerHorse.png");
-var ghostHorse = new Horse(10, 80, "images/ghostHorse.png");
-
-var ScoreMoment = function(secondsLeft, score) {
-	this.secondsLeft = secondsLeft;
-	this.score = score;
-}
+var player = new Player(10, 20, "images/playerHorse.png");
+var ghost = new Player(10, 80, "images/ghostHorse.png");
 
 function showGameOver() {
 	$('.gameOverDiv').show();
@@ -83,16 +66,15 @@ function start() {
 
 	// Reset everything and start a new game
 
-	currentWord = "";
-	currentNum = 0;
-	foundWords = [];
+	player.startFresh();
+
 	secondsLeft = 61;
-	wordStarted = false;
 	playingGame = true;
-	playerHorse.resetPosition();
-	playerScore = 0;
-	ghostHorse.resetPosition();
-	scoreMoments = [];
+
+	//playerHorse.resetPosition();
+	//playerScore = 0;
+	//ghostHorse.resetPosition();
+	//scoreMoments = [];
 
 	showGameplay();
     $('.gameText').html("");
@@ -106,7 +88,6 @@ function start() {
 			console.log("Playing on random board");
 			currentBoardNum = response.boardNum;
 		}
-		console.log(currentBoardNum);
 		gameBoard = boards[currentBoardNum];
 		for (var i=0; i<16; i++) {
 			$(".gameTable tr td a span").toArray().forEach(function (element) {
@@ -136,7 +117,7 @@ function createPlayer() {
 		    {"user": $("#username").val(), "password": $("#password").val()},
 		    function (resp_body) {
 				if( resp_body.status) {
-					playerUserName = $("#username").val();
+					player.userName = $("#username").val();
 					showSelectOpponent(); //redirect to select user page
 				} else {
 					alert(resp_body.comment);
@@ -155,7 +136,7 @@ function loginPlayer() {
 		    {"user": $("#username").val(), "password": $("#password").val()},
 		    function (resp_body) {
 				if( resp_body.status) {
-					playerUserName = $("#username").val();
+					player.userName = $("#username").val();
 					showSelectOpponent(); //redirect to select user page
 				} else {
 					alert(resp_body.comment);
@@ -165,15 +146,15 @@ function loginPlayer() {
 }
 
 function selectGhostPlayer() {
-    opponentScoreMoments = []; // empty the array
+    ghost.scoreMoments = []; // empty the array
 
-	opponentName = $('.ghostPlayerSelect').find(":selected").val();
-	if (opponentName !== "none") { // not playing against any player
+	ghost.userName = $('.ghostPlayerSelect').find(":selected").val();
+	if (ghost.userName !== "none") { // not playing against any player
 		$.post("selectOpponent", 
-			   {"user": opponentName},
+			   {"user": ghost.userName},
 			   function (resp_body) {
 					if( resp_body.status) {
-						opponentScoreMoments = JSON.parse(resp_body.opponentScoreMoments);
+						ghost.scoreMoments = JSON.parse(resp_body.opponentScoreMoments);
 						currentOpponent = resp_body;
 					} else {
 						alert(resp_body.comment+
@@ -182,14 +163,14 @@ function selectGhostPlayer() {
 			   }
 		);
 		playingGhost = true;
-		ghostHorse.show();
+		ghost.horse.show();
 	} else {
 		playingGhost = false;
-		ghostHorse.hide();
+		ghost.horse.hide();
 	}
 
 	// position the player's horse based on wether or not a ghost race is happening
-	playerHorse.changeY(playingGhost);
+	player.horse.changeY(playingGhost);
 
 	$('.ghostPlayerSelect').empty()
     .append('<option selected value="none">I don\'t want to play against anyone.</option>');
@@ -199,12 +180,12 @@ function selectGhostPlayer() {
 
 function replay() {
 	if (playingGhost) {
-		opponentScoreMoments = [];
+		ghost.scoreMoments = [];
 		$.post("selectOpponent", 
-			   {"user": opponentName},
+			   {"user": ghost.userName},
 			   function (resp_body) {
 					if( resp_body.status) {
-						opponentScoreMoments = JSON.parse(resp_body.opponentScoreMoments);
+						ghost.scoreMoments = JSON.parse(resp_body.opponentScoreMoments);
 					} else {
 						alert(resp_body.comment+
 							  "\nGhost player is not available at this point.");
@@ -222,11 +203,11 @@ function timerInterval() {
     $('.timerText').html(--secondsLeft);
 
     // move the ghost
-    for (var i=0; i<opponentScoreMoments.length; i++) {
-    	if (secondsLeft == opponentScoreMoments[i].secondsLeft) {
-    		opponentScore += opponentScoreMoments[i].score;
-    		ghostHorse.scorePosition = opponentScore;
-    		ghostHorse.run();
+    for (var i=0; i<ghost.scoreMoments.length; i++) {
+    	if (secondsLeft == ghost.scoreMoments[i].secondsLeft) {
+    		ghost.score += ghost.scoreMoments[i].score;
+    		ghost.horse.scorePosition = ghost.score;
+    		ghost.horse.run();
     	}
     }
 
@@ -243,24 +224,24 @@ function timerInterval() {
         $(".currentWord").html("");
 
         var raceResult;
-        if (playerScore > opponentScore) {
+        if (player.score > ghost.score) {
         	raceResult = "won";
-        } else if (playerScore < opponentScore) {
+        } else if (player.score < ghost.score) {
         	raceResult = "lost";
         } else {
         	raceResult = "tied";
         }
 
         if (!playingGhost) {
-        	$("#gameResult").html("You found " + currentNum + " words for a score of " + playerScore + "!");
+        	$("#gameResult").html("You found " + player.currentNum + " words for a score of " + player.score + "!");
         } else {
-        	$("#gameResult").html("<p>You found " + currentNum + " words for a score of " + playerScore + "!</p>" +
-        						  "<p>You " + raceResult + " against your ghost racer!");
+        	$("#gameResult").html("<p>You found " + player.currentNum + " words for a score of " + player.score + "!</p>" +
+        						  "<p>You " + raceResult + " against " + ghost.userName + "!");
         }
 
         // send the array to server
         $.post("saveScoreMoments", 
-        	   {"user": playerUserName, "scoreMoments": JSON.stringify(scoreMoments), "boardNum": currentBoardNum, "totalScore": playerScore},
+        	   {"user": player.userName, "scoreMoments": JSON.stringify(player.scoreMoments), "boardNum": currentBoardNum, "totalScore": player.score},
         	   	function (resp_body) {
 					if(!resp_body.status) {
 						alert(resp_body.comment);
@@ -271,10 +252,10 @@ function timerInterval() {
 				}
 		);
 
-		ghostHorse.resetPosition();
-        playerHorse.resetPosition();
-		playerScore = 0;
-		opponentScore = 0;
+		ghost.horse.resetPosition();
+        player.horse.resetPosition();
+		player.score = 0;
+		ghost.score = 0;
         showGameOver();
 
     } else {
@@ -289,34 +270,34 @@ function eraseSelections() {
 		var $gameSpace = $(element);
 		$gameSpace.removeClass("clicked");
 	});
-	currentWord = "";
-	$(".currentWord").html(currentWord);
-	wordStarted = false;
-	wordLength = 0;
+	player.currentWord = "";
+	$(".currentWord").html(player.currentWord);
+	player.wordStarted = false;
+	player.wordLength = 0;
 }
 
 function enterWord() {
 	// Check to see if the currently selected sequence of letters is a word
-	if ($.inArray(currentWord, foundWords) > -1) {
+	if ($.inArray(player.currentWord, player.foundWords) > -1) {
 		// the word has already been found
-		$(".alertText").html("Already entered '" + currentWord + "'!");
-	} else if ($.inArray(currentWord, dictionary) > -1) {
+		$(".alertText").html("Already entered '" + player.currentWord + "'!");
+	} else if ($.inArray(player.currentWord, dictionary) > -1) {
 		
 		// a new word has been found!
 
 		$(".alertText").html("");
-		currentScore = wordLength * 10;
-		currentNum++;
-		playerScore += currentScore;
-		$(".gameText").html("Score: " + playerScore);
+		currentScore = player.wordLength * 10;
+		player.currentNum++;
+		player.score += currentScore;
+		$(".gameText").html("Score: " + player.score);
 		// add the word to the list of found words
-		foundWords.push(currentWord);
+		player.foundWords.push(player.currentWord);
 		// move the player's horse forward
-		playerHorse.scorePosition = playerScore;
+		player.horse.scorePosition = player.score;
 		// call the horse's running animation
-		playerHorse.run();
+		player.horse.run();
 		// save the time and progress
-		scoreMoments.push(new ScoreMoment(secondsLeft, currentScore));
+		player.scoreMoments.push(new ScoreMoment(secondsLeft, currentScore));
 
 	} else {
 		// the sequence of letters isn't in the dictionary
@@ -328,8 +309,8 @@ function enterWord() {
 }
 
 var frameTick = function () {
-	playerHorse.updatePosition();
-	ghostHorse.updatePosition();
+	player.horse.updatePosition();
+	ghost.horse.updatePosition();
 	gameStage.update();
 };
 
@@ -348,15 +329,15 @@ function main() {
 			adj = $gameSpace.data('adj');
 			lastId = parseInt($(".lastClicked").attr("id"));
 
-			if ((((! $gameSpace.hasClass("clicked")) && ($.inArray(lastId, adj) > -1)) || (wordStarted == false)) && playingGame) {
+			if ((((! $gameSpace.hasClass("clicked")) && ($.inArray(lastId, adj) > -1)) || (player.wordStarted == false)) && playingGame) {
 				$(".gameTable tr td a span").removeClass("lastClicked");
 				$gameSpace.addClass("lastClicked")
 				$gameSpace.addClass("clicked");
-				currentWord += $letter;
-				wordLength++;
-				$(".currentWord").html(currentWord);
-				if (wordStarted == false) {
-					wordStarted = true;
+				player.currentWord += $letter;
+				player.wordLength++;
+				$(".currentWord").html(player.currentWord);
+				if (player.wordStarted == false) {
+					player.wordStarted = true;
 					$(".alertText").html("");
 				}
 			}
