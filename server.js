@@ -169,34 +169,6 @@ app.post("/saveScoreMoments", function (req, res) {
 				res.json({"status": true, "newHighScore": false});
 			}
 
-			///// TODO below code is for saving the best scores 
-			///// if we want to do that, we need to create the class ScoreMoment on the server side
-			///// that is the same as the one on the client side. Ned told me that it was a bad approach
-			// var currentScoreMoments = result.scoreMoments;
-			// if (currentScoreMoments) {
-			// 	// we only save the best scores of the users 
-			// 	// TODO assume a user's initial score is 0 (refer to the conversation at 12pm on 5/24)
-			// 	if (currentScoreMoments[currentScoreMoments.length-1].score > 
-			// 		newScoreMoments[newScoreMoments.length-1].score) { 
-			// 		result.update(
-			// 			{"scoreMoments": the_body.scoreMoments},
-			// 			function (err, id) {
-			// 				if (err) {
-			// 					res.json({"status": false, "comment": ("Database error: " + err)});
-			// 				}
-			// 			}
-			// 		);
-			// 	}
-			// } else { // user's first time playing this game
-			// 	result.update(
-			// 		{"scoreMoments": the_body.scoreMoments},
-			// 		function (err, id) {
-			// 			if (err) {
-			// 				res.json({"status": false, "comment": ("Database error: " + err)});
-			// 			}
-			// 		}
-			// 	);
-			// }
 		} else {
 			res.json({"status": false, "comment": "current user's information is not in the database!"});
 		}
