@@ -1,3 +1,5 @@
+"use strict";
+
 var ScoreMoment = function(secondsLeft, score) {
 	this.secondsLeft = secondsLeft;
 	this.score = score;

@@ -1,4 +1,7 @@
-var dictionary, adj, lastId, gameBoard;
+"use strict";
+
+// set up globals
+var dictionary, adj, lastId, gameBoard, currentOpponent, currentScore;
 var secondsLeft = 61;
 var playingGame = false;
 var playingGhost = false;
@@ -71,21 +74,14 @@ function start() {
 	secondsLeft = 61;
 	playingGame = true;
 
-	//playerHorse.resetPosition();
-	//playerScore = 0;
-	//ghostHorse.resetPosition();
-	//scoreMoments = [];
-
 	showGameplay();
     $('.gameText').html("");
 
 	$.get("readBoard", {}, function (response) {
 		var boards = response.boards;
 		if (playingGhost) {
-			console.log("Playing on ghost's last board");
 			currentBoardNum = currentOpponent.boardNum;
 		} else {
-			console.log("Playing on random board");
 			currentBoardNum = response.boardNum;
 		}
 		gameBoard = boards[currentBoardNum];
@@ -233,10 +229,16 @@ function timerInterval() {
         }
 
         if (!playingGhost) {
-        	$("#gameResult").html("You found " + player.currentNum + " words for a score of " + player.score + "!");
+        	if (player.currentNum != 1) $("#gameResult").html("You found " + player.currentNum + " words for a score of " + player.score + "!");
+        	else $("#gameResult").html("You found " + player.currentNum + " word for a score of " + player.score + "!");
         } else {
-        	$("#gameResult").html("<p>You found " + player.currentNum + " words for a score of " + player.score + "!</p>" +
-        						  "<p>You " + raceResult + " against " + ghost.userName + "!");
+        	if (player.currentNum != 1) {
+        		$("#gameResult").html("<p>You found " + player.currentNum + " words for a score of " + player.score + "!</p>" +
+        						  	  "<p>You " + raceResult + " against " + ghost.userName + "!");
+        	} else {
+        		$("#gameResult").html("<p>You found " + player.currentNum + " word for a score of " + player.score + "!</p>" +
+        						  	  "<p>You " + raceResult + " against " + ghost.userName + "!");
+        	}
         }
 
         // send the array to server
