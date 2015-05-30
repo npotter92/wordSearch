@@ -241,10 +241,11 @@ function timerInterval() {
         } else {
         	if (player.currentNum != 1) {
         		$("#gameResult").html("<p>You found " + player.currentNum + " words for a score of " + player.score + "!</p>" +
-        						  	  "<p>You " + raceResult + " against " + ghost.userName + "!");
+        						  	  "<p>You " + raceResult + " against " + ghost.userName + ", who got a score of " + ghost.score + "!");
         	} else {
         		$("#gameResult").html("<p>You found " + player.currentNum + " word for a score of " + player.score + "!</p>" +
-        						  	  "<p>You " + raceResult + " against " + ghost.userName + "!");
+        						  	  "<p>You " + raceResult + " against " + ghost.userName + ", who got a score of " + ghost.score + "!");
+
         	}
         }
 
@@ -327,6 +328,7 @@ function main() {
 	// Event handling
 	var clicked = [];
 
+	// loop through each element of the boggle board
 	$(".gameTable tr td a span").toArray().forEach(function (element) {
 
 		var $gameSpace = $(element);
@@ -338,6 +340,7 @@ function main() {
 			adj = $gameSpace.data('adj');
 			lastId = parseInt($(".lastClicked").attr("id"));
 
+			// add the 'clicked' class to the space and add the letter to the current words
 			if ((((! $gameSpace.hasClass("clicked")) && ($.inArray(lastId, adj) > -1)) || (player.wordStarted == false)) && playingGame) {
 				$(".gameTable tr td a span").removeClass("lastClicked");
 				$gameSpace.addClass("lastClicked")
