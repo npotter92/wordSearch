@@ -193,6 +193,13 @@ function replay() {
 	start();
 }
 
+function logout() {
+	$('#username').val("");
+	$('#password').val("");
+	$('.ghostPlayerSelect').empty().append('<option selected value="none">I don\'t want to play against anyone.</option>');
+	showLogin();
+}
+
 
 function timerInterval() {
 	// Handle the game timer

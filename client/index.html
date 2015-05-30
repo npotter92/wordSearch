@@ -24,12 +24,12 @@
 				</div> <!-- contentDiv -->
 
 				<div class='selectOpponentDiv'>
-					<p class='selectOpponentText'> Select the ghost player you want to play against! </p>
-
+					<p class='selectOpponentText'> Select the ghost player you want to play against!</p>
 					<select class="ghostPlayerSelect">
 						<option selected value="none">I don't want to play against anyone.</option>
 					</select>
-					<button onclick='selectGhostPlayer();'><span class='buttonText'>Start!</span></button>				
+					<button onclick='selectGhostPlayer();'><span class='buttonText'>Start!</span></button>	
+					<button onclick='logout();'><span class='buttonText'>Logout</span></button>		
 				</div>
 
 				<div class='gameplayDiv'>
@@ -91,6 +91,7 @@
 					<p class='gameText' id='gameResult'></p>
 					<button onclick='replay();'><span class='buttonText'>Play Again!</span></button>
 					<button onclick='showSelectOpponent();'><span class='buttonText'>Select Another Ghost Player!</span></button>
+					<button onclick='logout();'><span class='buttonText'>Logout</span></button>
 				</div> <!-- gameOverDiv -->
 
 			</div> <!-- contentDiv -->
