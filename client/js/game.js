@@ -14,6 +14,9 @@ var player = new Player(10, 20, "images/playerHorse.png");
 var ghost = new Player(10, 80, "images/ghostHorse.png");
 
 function showGameOver() {
+
+	// Display the game over screen
+
 	$('.gameOverDiv').show();
 	$('.selectOpponentDiv').hide();
 	$('.gameplayDiv').hide();
@@ -21,6 +24,9 @@ function showGameOver() {
 }
 
 function showGameplay() {
+
+	// Display the gameplay screen
+
 	$('.gameplayDiv').show();
 	$('.gameOverDiv').hide();
 	$('.loginDiv').hide();
@@ -28,6 +34,9 @@ function showGameplay() {
 }
 
 function showLogin() {
+
+	// Display login screen
+
 	$('.loginDiv').show();
 	$('.gameplayDiv').hide();
 	$('.gameOverDiv').hide();
@@ -35,11 +44,15 @@ function showLogin() {
 }
 
 function showSelectOpponent() {
+
+	// Display opponent selection screen
+
 	$('.selectOpponentDiv').show();
 	$('.loginDiv').hide();
 	$('.gameplayDiv').hide();
 	$('.gameOverDiv').hide();
 
+	// get the list of all resistered players
 	$.post("getPlayerList", {},
 		   function (resp_body) {
 		   		if (resp_body.status) {
@@ -57,7 +70,9 @@ function showSelectOpponent() {
 }
 
 function loadDictionary() {
+
 	// Load in the dictionary file and call main once complete
+
 	$.get("dictionary", {}, function (response) {
     	dictionary = response.dict;
     	main();
@@ -77,6 +92,7 @@ function start() {
 	showGameplay();
     $('.gameText').html("");
 
+    // fill in the game board
 	$.get("readBoard", {}, function (response) {
 		var boards = response.boards;
 		if (playingGhost) {
@@ -99,6 +115,9 @@ function start() {
 }
 
 function createPlayer() {
+
+	// create a new player based on values in the username and password fields
+
 	if ($("#username").val().trim().length === 0 || 
 		$("#password").val().trim().length === 0) {
 		return;
@@ -124,6 +143,9 @@ function createPlayer() {
 }
 
 function loginPlayer() {
+
+	// login player based on username and password fields, if the user and corresponding password exist
+
 	if ($("#username").val().trim().length === 0 || 
 		$("#password").val().trim().length === 0) {
 		return;
@@ -142,6 +164,9 @@ function loginPlayer() {
 }
 
 function selectGhostPlayer() {
+
+	// set up the ghost player based on the user's choice of opponent
+
     ghost.scoreMoments = []; // empty the array
 
 	ghost.userName = $('.ghostPlayerSelect').find(":selected").val();
@@ -175,6 +200,9 @@ function selectGhostPlayer() {
 }
 
 function replay() {
+
+	// start the game again with the same conditions as the game just played
+
 	if (playingGhost) {
 		ghost.scoreMoments = [];
 		$.post("selectOpponent", 
@@ -194,6 +222,9 @@ function replay() {
 }
 
 function logout() {
+
+	// log the currently logged in player out
+
 	$('#username').val("");
 	$('#password').val("");
 	$('.ghostPlayerSelect').empty().append('<option selected value="none">I don\'t want to play against anyone.</option>');
@@ -202,6 +233,9 @@ function logout() {
 
 
 function timerInterval() {
+
+	// function called every second during gameplay
+
 	// Handle the game timer
     $('.timerText').html(--secondsLeft);
 
@@ -287,6 +321,9 @@ function eraseSelections() {
 }
 
 function enterWord() {
+
+	// enter the currently selected word
+
 	// Check to see if the currently selected sequence of letters is a word
 	if ($.inArray(player.currentWord, player.foundWords) > -1) {
 		// the word has already been found
