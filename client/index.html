@@ -21,6 +21,7 @@
 					<input type='password' id='password' placeholder='password'>
 					<button onclick='createPlayer();'><span class='buttonText'>Create New Player</span></button>
 					<button onclick='loginPlayer();'><span class='buttonText'>Login</span></button>
+					<button onclick='showLeaderBoard();'><span class='buttonText'>LeaderBoard</span></button>
 				</div> <!-- contentDiv -->
 
 				<div class='selectOpponentDiv'>
@@ -80,7 +81,7 @@
 
 					<div class='canvasDiv'>
 
-						<canvas class="raceCanvas" id="raceCanvas" width="750" height="150"></canvas>
+						<canvas class="raceCanvas" id="raceCanvas" width="750" height="150"></canvas>leaderboard
 
 					</div> <!-- canvasDiv -->
 
@@ -93,6 +94,16 @@
 					<button onclick='showSelectOpponent();'><span class='buttonText'>Select Another Ghost Player!</span></button>
 					<button onclick='logout();'><span class='buttonText'>Logout</span></button>
 				</div> <!-- gameOverDiv -->
+
+				<div class='leaderboardDiv'>
+					<table class='leaderboard'>
+						<tr>
+							<th>Rank</th>
+							<th>Player</th>
+							<th>Score</th>
+						</tr>
+					</table>
+				</div> <!-- leaderBoardDiv -->
 
 			</div> <!-- contentDiv -->
 

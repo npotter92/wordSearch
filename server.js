@@ -90,6 +90,25 @@ app.post("/getPlayerList", function (req, res) {
 	)
 });
 
+app.post("/getTopPlayers", function (req, res) {
+	users.find({}).sort({ highScore: -1 }).limit(10).exec(
+		function (err, documents){
+			if(err) { 
+				res.json({"status": false, "comment": ("Database error: " + err)});
+				return;
+			}
+
+			var numberOfTopPlayers= documents.length < 10 ? documents.length : 10;
+			var topPlayerInformation = [];
+			for (var i = 0; i < numberOfTopPlayers; i++) {
+				topPlayerInformation.push(documents[i].user);
+				topPlayerInformation.push(documents[i].highScore);
+			}
+			res.json({"status": true, "topPlayers": JSON.stringify(topPlayerInformation)});
+		}
+	);
+});
+
 app.post("/selectOpponent", function (req, res) {
 	var user = req.body.user;
 

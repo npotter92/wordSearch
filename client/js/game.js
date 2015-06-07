@@ -69,6 +69,40 @@ function showSelectOpponent() {
 	);
 }
 
+function showLeaderBoard() {
+
+	$('.selectOpponentDiv').hide();
+	$('.loginDiv').hide();
+	$('.gameplayDiv').hide();
+	$('.gameOverDiv').hide();
+	$('.leaderboardDiv').show();
+
+	// set up the header
+	$('.leaderboard').empty()
+    .append('<tr> <th>Rank</th> <th>Player</th> <th>Score</th> </tr>');
+
+	$.post("getTopPlayers", {},
+		function (resp_body) {
+			if (resp_body.status) {
+
+				// how topPlayerInformation looks: player -> score -> player -> score -> player ....
+				var topPlayerInformation = JSON.parse(resp_body.topPlayers);
+
+				for (var i = 0; i < topPlayerInformation.length; i += 2) {
+					var $rank_td = $("<td>").text(i/2+1);
+					var $player_td = $("<td>").text(topPlayerInformation[i]);
+					var $score_td = $("<td>").text(topPlayerInformation[i+1]);
+					var $tr = $("<tr>").append($rank_td).append($player_td).append($score_td);
+					$(".leaderboard").append($tr);
+				}
+			} else {
+				alert("Unable to retrieve leaderboard information! Server response: " + resp_body.comment);
+			}
+		}
+	);
+
+}
+
 function loadDictionary() {
 
 	// Load in the dictionary file and call main once complete

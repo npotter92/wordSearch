@@ -86,6 +86,21 @@ button {
 	display: none;
 }
 
+.leaderboardDiv {
+	display: none;
+	margin: 0 auto;
+}
+
+.leaderboard {
+	border: 1px solid green;
+    border-collapse: collapse;
+}
+
+.leaderboard th, .leaderboard td{
+	padding: 15px;
+}
+
+
 .tableDiv {
 	float: left;
 	width: 400px;
