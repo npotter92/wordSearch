@@ -88,18 +88,30 @@ button {
 
 .leaderboardDiv {
 	display: none;
-	margin: 0 auto;
 }
 
 .leaderboard {
-	border: 1px solid green;
+	margin: 0 auto;
     border-collapse: collapse;
 }
 
-.leaderboard th, .leaderboard td{
-	padding: 15px;
+.leaderboard tr {
+	border: 1px solid green;
 }
 
+.leaderboard tr:nth-child(odd) {
+    background-color: #CCCCFF;
+}
+
+.leaderboard tr:nth-child(even) {
+    background-color: #FFFFFF;
+}
+
+.leaderboard th, .leaderboard td{
+	border: 1px solid green;
+	padding-left: 15px;
+	padding-right: 50px;
+}
 
 .tableDiv {
 	float: left;

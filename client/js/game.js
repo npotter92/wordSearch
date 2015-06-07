@@ -20,7 +20,8 @@ function showGameOver() {
 	$('.gameOverDiv').show();
 	$('.selectOpponentDiv').hide();
 	$('.gameplayDiv').hide();
-	$('.loginDiv').hide();
+	$('.loginDiv').hide();	
+	$('.leaderboardDiv').hide();
 }
 
 function showGameplay() {
@@ -31,6 +32,8 @@ function showGameplay() {
 	$('.gameOverDiv').hide();
 	$('.loginDiv').hide();
 	$('.selectOpponentDiv').hide();
+	$('.leaderboardDiv').hide();
+
 }
 
 function showLogin() {
@@ -41,6 +44,8 @@ function showLogin() {
 	$('.gameplayDiv').hide();
 	$('.gameOverDiv').hide();
 	$('.selectOpponentDiv').hide();
+	$('.leaderboardDiv').hide();
+
 }
 
 function showSelectOpponent() {
@@ -51,6 +56,8 @@ function showSelectOpponent() {
 	$('.loginDiv').hide();
 	$('.gameplayDiv').hide();
 	$('.gameOverDiv').hide();
+	$('.leaderboardDiv').hide();
+
 
 	// get the list of all resistered players
 	$.post("getPlayerList", {},
