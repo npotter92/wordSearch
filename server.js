@@ -1,7 +1,10 @@
 var express = require("express"),
 	http = require("http"),
     fs = require("fs"),
-    mongoose = require('mongoose'),
+    
+    // for ne database
+    Nedb = require('nedb'),
+	users = new Nedb({ filename: './nedb.txt', autoload: true }),
 
 	app;
 
@@ -15,38 +18,6 @@ app.use(express.static(__dirname + "/client"));
 
 // tell Express to parse incoming JSON objects 
 app.use(express.urlencoded());
-
-
-
-// for mongoose connection 
-
-mongoose.connect('mongodb://localhost/wordSearchDB');
-
-mongoose.connection.on('connected', function () {
-     console.log('Mongoose connected');
-});
-
-mongoose.connection.on('error',function (err) {
-     console.log('Mongoose connection error: ' + err);
-});
-
-mongoose.connection.on('disconnected', function () {
-     console.log('Mongoose disconnected');
-});
-
-
-// create users collection
-
-var UserSchema = mongoose.Schema({ user: String,
-                                   password: String,
-                                   scoreMoments: String,
-                                   boardNum: Number,
-                                   highScore: Number // TODO what else should be included
-                                 });
-
-var User = mongoose.model("User", UserSchema);
-
-// routes
 
 app.get("/dictionary", function (req, res) {
 	var dictionary = new Array();
@@ -69,26 +40,28 @@ app.get("/readBoard", function (req, res) {
 
 app.post("/register", function (req, res) {
 	var the_body = req.body;
-	mongoCheckCredentialExistence(the_body, function (answer){
+	checkCredentialExistence(the_body, function (answer){
 		if (answer.user === true) { 
 			res.json({"status": false, "comment": "Username has been taken!"});
 		} else {
-			var u1 = new User({"user": the_body.user, "password": the_body.password, "highScore": 0});
-			u1.save(function (err, data) {
-				if (err != null) {
-					res.json({"status": false, "comment": "Database error!"});
-				} else {
-				  	console.log("saved successfully! savd id: ", data._id);
-					res.json({"status": true});
+			users.insert(
+				{"user": the_body.user, "password": the_body.password, "highScore": 0}, 
+				function (err, data) {
+					if (err != null) {
+						res.json({"status": false, "comment": "Database error!"});
+					} else {
+					  	console.log("saved successfully! savd id: ", data._id);
+						res.json({"status": true});
+					}
 				}
-			});
+			);
 		}
 	});
 });
 
 app.post("/login", function (req, res) {
 	var the_body = req.body;
-	mongoCheckCredentialExistence(the_body, function (answer){
+	checkCredentialExistence(the_body, function (answer){
 		if (answer.user && answer.password) { 
 			res.json({"status": true});
 		} else {
@@ -98,7 +71,7 @@ app.post("/login", function (req, res) {
 });
 
 app.post("/getPlayerList", function (req, res) {
-	User.find({}).exec(
+	users.find({}).exec(
 		function (err, documents){
 			if(err) { 
 				res.json({"status": false, "comment": ("Database error: " + err)});
@@ -120,7 +93,7 @@ app.post("/getPlayerList", function (req, res) {
 app.post("/selectOpponent", function (req, res) {
 	var user = req.body.user;
 
-	User.findOne({"user": user}, 
+	users.findOne({"user": user}, 
 		function(err, result) {
 			if(err) { 
 				res.json({"status": false, "comment": ("Database error: " + err)});
@@ -147,7 +120,7 @@ app.post("/saveScoreMoments", function (req, res) {
 	var newBoardNum = JSON.parse(the_body.boardNum);
 	var score = JSON.parse(the_body.totalScore);
 
-	User.findOne({"user": user}, function(err, result) {
+	users.findOne({"user": user}, function(err, result) {
 		if(err) { 
 			res.json({"status": false, "comment": ("Database error: " + err)});
 			return;
@@ -155,19 +128,20 @@ app.post("/saveScoreMoments", function (req, res) {
 
 		if (result) {
 			if (score > result.highScore) {
-				result.update(
-					{"scoreMoments": the_body.scoreMoments, "boardNum": the_body.boardNum, "highScore": score},
-					function (err, id) {
+				users.update({"_id": result._id}, 
+					{$set: {"scoreMoments": the_body.scoreMoments, "boardNum": the_body.boardNum, "highScore": score} },
+					{upsert: true},
+					function (err, numReplaced) {
 						if (err) {
 							res.json({"status": false, "comment": ("Database error: " + err)});
 						}
 					}
+
 				);
 				res.json({"status": true, "newHighScore": true});
 			} else {
 				res.json({"status": true, "newHighScore": false});
 			}
-
 		} else {
 			res.json({"status": false, "comment": "current user's information is not in the database!"});
 		}
@@ -175,11 +149,12 @@ app.post("/saveScoreMoments", function (req, res) {
 
 });
 
-function mongoCheckCredentialExistence (credential, callback) {
+
+function checkCredentialExistence (credential, callback) {
 	var user = credential.user;
 	var password = credential.password;
 
-	User.findOne({"user": user}, function(err, result){
+	users.findOne({"user": user}, function(err, result){
 		if(err) { // err indicates error; it does not indicate no result found
 			callback({"err": err});
 			return;
@@ -198,3 +173,4 @@ function mongoCheckCredentialExistence (credential, callback) {
 	});
 
 }
+
