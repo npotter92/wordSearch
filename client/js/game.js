@@ -1,7 +1,8 @@
 "use strict";
 
 // set up globals
-var dictionary, adj, lastId, gameBoard, currentOpponent, currentScore;
+var dictionary, adj, lastId, gameBoard, currentOpponent, currentScore, lastPage;
+var currentPage = "login";
 var secondsLeft = 61;
 var playingGame = false;
 var playingGhost = false;
@@ -13,20 +14,35 @@ var rect = gameStage.canvas.getBoundingClientRect();
 var player = new Player(10, 20, "images/playerHorse.png");
 var ghost = new Player(10, 80, "images/ghostHorse.png");
 
+function goBack() {
+	if (lastPage = "gameOver") showGameOver();
+	else if (lastPage = "gameplay") showGameplay();
+	else if (lastPage = "login") showLogin();
+	else if (lastPage = "selectOpponent") showSelectOpponent();
+	else showLeaderBoard();
+}
+
 function showGameOver() {
 
 	// Display the game over screen
+
+	lastPage = currentPage;
+	currentPage = "gameOver";
 
 	$('.gameOverDiv').show();
 	$('.selectOpponentDiv').hide();
 	$('.gameplayDiv').hide();
 	$('.loginDiv').hide();	
 	$('.leaderboardDiv').hide();
+
 }
 
 function showGameplay() {
 
 	// Display the gameplay screen
+
+	lastPage = currentPage;
+	currentPage = "gameplay";
 
 	$('.gameplayDiv').show();
 	$('.gameOverDiv').hide();
@@ -40,6 +56,9 @@ function showLogin() {
 
 	// Display login screen
 
+	lastPage = currentPage;
+	currentPage = "login";
+
 	$('.loginDiv').show();
 	$('.gameplayDiv').hide();
 	$('.gameOverDiv').hide();
@@ -51,6 +70,9 @@ function showLogin() {
 function showSelectOpponent() {
 
 	// Display opponent selection screen
+
+	lastPage = currentPage;
+	currentPage = "selectOpponent";
 
 	$('.selectOpponentDiv').show();
 	$('.loginDiv').hide();
@@ -77,6 +99,9 @@ function showSelectOpponent() {
 }
 
 function showLeaderBoard() {
+
+	lastPage = currentPage;
+	currentPage = "leaderboard";
 
 	$('.selectOpponentDiv').hide();
 	$('.loginDiv').hide();
