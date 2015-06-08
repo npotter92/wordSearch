@@ -15,10 +15,11 @@ var player = new Player(10, 20, "images/playerHorse.png");
 var ghost = new Player(10, 80, "images/ghostHorse.png");
 
 function goBack() {
-	if (lastPage = "gameOver") showGameOver();
-	else if (lastPage = "gameplay") showGameplay();
-	else if (lastPage = "login") showLogin();
-	else if (lastPage = "selectOpponent") showSelectOpponent();
+
+	if (lastPage == "gameOver") showGameOver();
+	else if (lastPage == "gameplay") showGameplay();
+	else if (lastPage == "login") showLogin();
+	else if (lastPage == "selectOpponent") showSelectOpponent();
 	else showLeaderBoard();
 }
 
